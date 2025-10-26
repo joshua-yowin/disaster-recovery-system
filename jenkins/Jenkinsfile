@@ -1,0 +1,83 @@
+// Simplified Working Jenkinsfile
+pipeline {
+    agent any
+    
+    environment {
+        PROJECT_NAME = 'disaster-recovery-system'
+        BUILD_NUMBER = "${env.BUILD_NUMBER}"
+    }
+    
+    stages {
+        stage('📥 Checkout') {
+            steps {
+                echo '================================'
+                echo '📥 Checking out code...'
+                echo '================================'
+                checkout scm
+                sh 'git log -1 --pretty=format:"%h - %an: %s"'
+            }
+        }
+        
+        stage('🔧 Setup') {
+            steps {
+                echo '================================'
+                echo '🔧 Setting up environment...'
+                echo '================================'
+                sh '''
+                    python3 -m pip install --upgrade pip --user
+                    python3 -m pip install -r requirements.txt --user
+                    echo "✅ Dependencies installed"
+                '''
+            }
+        }
+        
+        stage('🧪 Test') {
+            steps {
+                echo '================================'
+                echo '🧪 Running tests...'
+                echo '================================'
+                sh '''
+                    python3 -m py_compile app/*.py
+                    python3 app/backup.py
+                    echo "✅ Tests passed"
+                '''
+            }
+        }
+        
+        stage('💾 Backup') {
+            steps {
+                echo '================================'
+                echo '💾 Creating backup...'
+                echo '================================'
+                sh '''
+                    python3 app/backup.py
+                    ls -lh backups/
+                '''
+            }
+        }
+        
+        stage('📊 Report') {
+            steps {
+                echo '================================'
+                echo '📊 Build Report'
+                echo '================================'
+                sh '''
+                    echo "Build: #${BUILD_NUMBER}"
+                    echo "Project: ${PROJECT_NAME}"
+                    echo "Status: SUCCESS"
+                    echo "Timestamp: $(date)"
+                '''
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '🎉 Pipeline completed successfully!'
+            archiveArtifacts artifacts: 'backups/*.zip', allowEmptyArchive: true
+        }
+        failure {
+            echo '❌ Pipeline failed!'
+        }
+    }
+}

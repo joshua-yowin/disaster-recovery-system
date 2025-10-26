@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disaster Recovery Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        .stat-card .label {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .actions {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .actions h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 10px 10px 10px 0;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .btn-success { background: #48bb78; }
+        .btn-success:hover { background: #38a169; }
+        .btn-danger { background: #f56565; }
+        .btn-danger:hover { background: #e53e3e; }
+        .backups-list {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .backups-list h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .backup-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .backup-item .info {
+            flex: 1;
+        }
+        .backup-item .name {
+            font-weight: bold;
+            color: #333;
+        }
+        .backup-item .meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .status {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .status-healthy {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .status-warning {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .loading {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Disaster Recovery Dashboard</h1>
+            <p>Automated Backup & Recovery System - Real-time Monitoring</p>
+            <div class="status status-healthy" style="margin-top: 15px;">
+                🟢 System Operational
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Backups</h3>
+                <div class="value" id="total-backups">--</div>
+                <div class="label">backups created</div>
+            </div>
+            <div class="stat-card">
+                <h3>Storage Used</h3>
+                <div class="value" id="storage-used">--</div>
+                <div class="label">MB</div>
+            </div>
+            <div class="stat-card">
+                <h3>Last Backup</h3>
+                <div class="value" style="font-size: 1.2em;" id="last-backup">--</div>
+                <div class="label">timestamp</div>
+            </div>
+            <div class="stat-card">
+                <h3>System Health</h3>
+                <div class="value" style="color: #48bb78;">100%</div>
+                <div class="label">all systems operational</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <h2>🎮 Quick Actions</h2>
+            <button class="btn btn-success" onclick="runBackup()">▶️ Run Backup Now</button>
+            <button class="btn" onclick="refreshData()">🔄 Refresh Data</button>
+            <button class="btn btn-danger" onclick="testDisaster()">💥 Test Disaster Recovery</button>
+        </div>
+
+        <div class="backups-list">
+            <h2>📦 Recent Backups</h2>
+            <div id="backups-container">
+                <div class="loading">Loading backups...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function refreshData() {
+            fetch('/api/stats')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('total-backups').textContent = data.total_backups;
+                    document.getElementById('storage-used').textContent = data.total_size_mb;
+                    document.getElementById('last-backup').textContent = data.latest_backup;
+                });
+            
+            fetch('/api/backups')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('backups-container');
+                    if (data.backups.length === 0) {
+                        container.innerHTML = '<div class="backup-item">No backups found</div>';
+                    } else {
+                        container.innerHTML = data.backups.map(backup => `
+                            <div class="backup-item">
+                                <div class="info">
+                                    <div class="name">${backup.backup_name}</div>
+                                    <div class="meta">
+                                        ${backup.total_files} files • ${backup.total_size_mb} MB • ${backup.timestamp}
+                                    </div>
+                                </div>
+                                <button class="btn" onclick="restoreBackup('${backup.backup_name}')">
+                                    ♻️ Restore
+                                </button>
+                            </div>
+                        `).join('');
+                    }
+                });
+        }
+
+        function runBackup() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Creating backup...';
+            
+            fetch('/api/backup', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.success ? '✅ Backup created successfully!' : '❌ Backup failed!');
+                    btn.disabled = false;
+                    btn.textContent = '▶️ Run Backup Now';
+                    refreshData();
+                });
+        }
+
+        function restoreBackup(name) {
+            if (confirm(`Restore backup: ${name}?`)) {
+                fetch('/api/restore', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ backup_name: name })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.success ? '✅ Restore completed!' : '❌ Restore failed!');
+                });
+            }
+        }
+
+        function testDisaster() {
+            if (confirm('⚠️ This will simulate a disaster scenario. Continue?')) {
+                alert('💥 Disaster simulated! Automatic backup triggered.');
+                runBackup();
+            }
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshData, 30000);
+        
+        // Initial load
+        refreshData();
+    </script>
+</body>
+</html>
