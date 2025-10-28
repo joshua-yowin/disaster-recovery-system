@@ -1,0 +1,9 @@
+# Example Terraform variables
+# Copy this file to terraform.tfvars and update with your values
+
+resource_group_name    = "disaster-recovery-rg"
+location              = "eastus"  # or "centralindia" based on your setup
+storage_account_name  = "drbackup2025"
+app_service_plan_name = "disaster-recovery-plan"
+web_app_name          = "disaster-recovery-dashboard-joshua"
+github_repo_url       = "https://github.com/YOUR-USERNAME/disaster-recovery-system"

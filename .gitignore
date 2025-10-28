@@ -7,27 +7,46 @@ __pycache__/
 env/
 venv/
 ENV/
-*.egg-info/
-dist/
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.backup
+
+# Logs
+*.log
+LogFiles/
+logs/
+app-logs.zip
+deployments/
+
+# Deployment packages
+*.zip
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Logs
-logs/
-*.log
-
-# Backups (don't commit actual backups)
-backups/*.zip
-!backups/.gitkeep
-
-# Environment
-.env
-.env.local
+*~
 
 # OS
 .DS_Store
@@ -35,10 +54,14 @@ Thumbs.db
 
 # Azure
 .azure/
-*.publishsettings
 
-# Terraform
-terraform/.terraform/
-*.tfstate
-*.tfstate.backup
-.terraform.lock.hcl
+# Environment
+.env
+.env.local
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+quickstart.sh
+startup.sh
