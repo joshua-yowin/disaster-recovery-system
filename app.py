@@ -1,5 +1,5 @@
 """
-Disaster Recovery System - Complete Dashboard with Backup Functionality
+Automated Backup System - Complete Dashboard with Backup Functionality
 """
 from flask import Flask, jsonify, render_template_string, request
 from flask_cors import CORS
@@ -7,8 +7,10 @@ import os
 from datetime import datetime
 import traceback
 
+
 app = Flask(__name__)
 CORS(app)
+
 
 # Import backup system
 try:
@@ -18,12 +20,13 @@ except Exception as e:
     print(f"Warning: Backup system not available: {e}")
     BACKUP_AVAILABLE = False
 
+
 # Enhanced HTML template with backup controls
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Disaster Recovery Dashboard</title>
+    <title>Automated Backup System</title>
     <style>
         body { font-family: Arial; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
         .container { background: white; padding: 30px; border-radius: 12px; max-width: 1000px; margin: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
@@ -94,11 +97,11 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Disaster Recovery System</h1>
+        <h1>🚀 Automated Backup System</h1>
         
         <div class="status">
             <h2>✅ System Online</h2>
-            <p>Complete backup and recovery system deployed on Azure</p>
+            <p>Complete automated backup and recovery system deployed on Azure</p>
             <p><strong>Timestamp:</strong> {{ timestamp }}</p>
         </div>
         
@@ -149,6 +152,7 @@ HTML_TEMPLATE = """
 </html>
 """
 
+
 @app.route('/')
 def home():
     """Main dashboard page"""
@@ -163,17 +167,19 @@ def home():
         backup_status=backup_status
     )
 
+
 @app.route('/health')
 def health():
     """Health check endpoint"""
     health_data = {
         'status': 'healthy',
-        'service': 'disaster-recovery-system',
+        'service': 'automated-backup-system',
         'timestamp': datetime.now().isoformat(),
         'azure_storage': 'connected' if os.getenv('AZURE_STORAGE_CONNECTION_STRING') else 'not configured',
         'backup_system': 'operational' if BACKUP_AVAILABLE else 'unavailable'
     }
     return jsonify(health_data)
+
 
 @app.route('/api/status')
 def status():
@@ -192,6 +198,7 @@ def status():
         ],
         'backup_system_available': BACKUP_AVAILABLE
     })
+
 
 # Backup API Endpoints
 @app.route('/api/backup/list')
@@ -215,6 +222,7 @@ def list_backups():
             'traceback': traceback.format_exc()
         }), 500
 
+
 @app.route('/api/backup/stats')
 def backup_stats():
     """Get backup system statistics"""
@@ -230,6 +238,7 @@ def backup_stats():
             'status': 'error',
             'message': str(e)
         }), 500
+
 
 @app.route('/api/backup/test', methods=['POST'])
 def test_backup():
@@ -263,6 +272,7 @@ def test_backup():
             'message': str(e),
             'traceback': traceback.format_exc()
         }), 500
+
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 8000))
