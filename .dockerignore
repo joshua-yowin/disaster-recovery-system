@@ -4,8 +4,8 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 venv/
+env/
 ENV/
 build/
 develop-eggs/
@@ -13,33 +13,32 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
+# Git
+.git/
+.gitignore
+.github/
+
 # Terraform
+terraform/
 *.tfstate
 *.tfstate.*
 .terraform/
 .terraform.lock.hcl
 terraform.tfvars
-*.backup
 
-# Logs
+# Logs and temporary files
 *.log
 LogFiles/
 logs/
 app-logs.zip
-deployments/
-
-# Deployment packages
 *.zip
+deployments/
+temp/
+tmp/
 
 # IDE
 .vscode/
@@ -55,17 +54,26 @@ Thumbs.db
 # Azure
 .azure/
 
-# Environment
+# Environment files
 .env
 .env.local
+.env.*.local
 
-# Temporary files
-*.tmp
-temp/
-tmp/
-quickstart.sh
-startup.sh
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+*.cover
 
-# Docker
-.env
-docker-compose.override.yml
+# Documentation
+*.md
+docs/
+!README.md
+
+# CI/CD
+.github/
+Jenkinsfile
+
+# Deployment packages
+azure-deploy*.zip
+deploy.zip

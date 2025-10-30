@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Main application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: disaster-recovery-system
+    image: disaster-recovery-system:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}
+      - AZURE_CONTAINER_NAME=${AZURE_CONTAINER_NAME:-backups}
+      - PORT=8000
+      - FLASK_ENV=${FLASK_ENV:-production}
+    volumes:
+      # Mount code for development (comment out for production)
+      - ./app.py:/app/app.py
+      - ./backup_system.py:/app/backup_system.py
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - disaster-recovery-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  disaster-recovery-net:
+    driver: bridge
+    name: disaster-recovery-network
